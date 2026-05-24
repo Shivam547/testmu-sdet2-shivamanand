@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "user-schema.json",
+  "title": "User",
+  "description": "JSONPlaceholder User schema",
+  "type": "object",
+  "required": ["id", "name", "username", "email"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the user",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "description": "Full name of the user",
+      "minLength": 1
+    },
+    "username": {
+      "type": "string",
+      "description": "Username/handle of the user",
+      "minLength": 1
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address of the user",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number of the user"
+    },
+    "website": {
+      "type": "string",
+      "description": "Website URL of the user"
+    },
+    "address": {
+      "type": "object",
+      "description": "Physical address of the user",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "suite": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "zipcode": {
+          "type": "string"
+        },
+        "geo": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "string",
+              "description": "Latitude coordinate"
+            },
+            "lng": {
+              "type": "string",
+              "description": "Longitude coordinate"
+            }
+          },
+          "required": ["lat", "lng"]
+        }
+      },
+      "required": ["street", "city", "zipcode", "geo"]
+    },
+    "company": {
+      "type": "object",
+      "description": "Company information",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Company name"
+        },
+        "catchPhrase": {
+          "type": "string",
+          "description": "Company catch phrase"
+        },
+        "bs": {
+          "type": "string",
+          "description": "Company business slogan"
+        }
+      },
+      "required": ["name"]
+    }
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "username": "tomsmith",
+    "password": "SuperSecretPassword!",
+    "shouldPass": true,
+    "description": "Valid credentials - should login successfully"
+  },
+  {
+    "username": "invalid_user",
+    "password": "invalid_pass",
+    "shouldPass": false,
+    "description": "Invalid username and password"
+  },
+  {
+    "username": "tomsmith",
+    "password": "wrong_password",
+    "shouldPass": false,
+    "description": "Valid username with invalid password"
+  },
+  {
+    "username": "wrong_user",
+    "password": "SuperSecretPassword!",
+    "shouldPass": false,
+    "description": "Invalid username with valid password"
+  },
+  {
+    "username": "",
+    "password": "SuperSecretPassword!",
+    "shouldPass": false,
+    "description": "Empty username"
+  },
+  {
+    "username": "tomsmith",
+    "password": "",
+    "shouldPass": false,
+    "description": "Empty password"
+  },
+  {
+    "username": "",
+    "password": "",
+    "shouldPass": false,
+    "description": "Empty username and password"
+  },
+  {
+    "username": "  ",
+    "password": "  ",
+    "shouldPass": false,
+    "description": "Whitespace only credentials"
+  },
+  {
+    "username": "admin",
+    "password": "admin",
+    "shouldPass": false,
+    "description": "Common default credentials - should fail"
+  },
+  {
+    "username": "TomSmith",
+    "password": "SuperSecretPassword!",
+    "shouldPass": false,
+    "description": "Case-sensitive username check"
+  }
+]

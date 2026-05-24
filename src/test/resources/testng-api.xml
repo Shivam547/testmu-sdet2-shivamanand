@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+    API-Only Test Suite Configuration
+    Runs only API tests (no browser required)
+    Usage: mvn test -DsuiteXmlFile=src/test/resources/testng-api.xml
+-->
+<suite name="TestMu SDET2 - API Test Suite" 
+       parallel="classes" 
+       thread-count="4"
+       verbose="2">
+    
+    <listeners>
+        <listener class-name="com.testmu.listeners.TestListener"/>
+    </listeners>
+    
+    <!-- CRUD API Tests -->
+    <test name="API - CRUD Operations">
+        <classes>
+            <class name="com.testmu.tests.api.CrudApiTest"/>
+        </classes>
+    </test>
+    
+    <!-- Authentication API Tests -->
+    <test name="API - Authentication">
+        <classes>
+            <class name="com.testmu.tests.api.AuthApiTest"/>
+        </classes>
+    </test>
+    
+    <!-- Error Handling API Tests -->
+    <test name="API - Error Handling">
+        <classes>
+            <class name="com.testmu.tests.api.ErrorHandlingTest"/>
+        </classes>
+    </test>
+    
+    <!-- Schema Validation API Tests -->
+    <test name="API - Schema Validation">
+        <classes>
+            <class name="com.testmu.tests.api.SchemaValidationTest"/>
+        </classes>
+    </test>
+    
+</suite>

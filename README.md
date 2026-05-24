@@ -320,7 +320,7 @@ With more time, I would add:
 
 ## 👤 Author
 
-**[Your Name]**
+**[Shivam Anand]**
 
 ---
 

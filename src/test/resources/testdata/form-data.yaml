@@ -1,0 +1,103 @@
+# Form Validation Test Data
+# YAML format for complex test data structures
+
+form_inputs:
+  valid_numbers:
+    - value: "123"
+      description: "Positive integer"
+      expected_valid: true
+    - value: "-456"
+      description: "Negative integer"
+      expected_valid: true
+    - value: "0"
+      description: "Zero"
+      expected_valid: true
+    - value: "3.14"
+      description: "Decimal number"
+      expected_valid: true
+    - value: "1000000"
+      description: "Large number"
+      expected_valid: true
+      
+  invalid_numbers:
+    - value: "abc"
+      description: "Letters only"
+      expected_valid: false
+    - value: "12abc34"
+      description: "Mixed alphanumeric"
+      expected_valid: false
+    - value: "!@#$"
+      description: "Special characters"
+      expected_valid: false
+    - value: "1 2 3"
+      description: "Numbers with spaces"
+      expected_valid: false
+
+dropdown_options:
+  - text: "Option 1"
+    value: "1"
+    index: 1
+  - text: "Option 2"
+    value: "2"
+    index: 2
+
+checkbox_states:
+  initial:
+    checkbox_1: false
+    checkbox_2: true
+  
+  test_scenarios:
+    - name: "Check all"
+      actions:
+        - index: 0
+          action: "check"
+        - index: 1
+          action: "check"
+      expected:
+        checkbox_1: true
+        checkbox_2: true
+        
+    - name: "Uncheck all"
+      actions:
+        - index: 0
+          action: "uncheck"
+        - index: 1
+          action: "uncheck"
+      expected:
+        checkbox_1: false
+        checkbox_2: false
+        
+    - name: "Toggle states"
+      actions:
+        - index: 0
+          action: "check"
+        - index: 1
+          action: "uncheck"
+      expected:
+        checkbox_1: true
+        checkbox_2: false
+
+text_inputs:
+  valid_text:
+    - value: "Hello World"
+      description: "Normal text"
+    - value: "Test123"
+      description: "Alphanumeric"
+    - value: "user@example.com"
+      description: "Email format"
+      
+  boundary_text:
+    - value: ""
+      description: "Empty string"
+    - value: "a"
+      description: "Single character"
+    - value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+      description: "Long text"
+      
+  special_characters:
+    - value: "<script>alert('XSS')</script>"
+      description: "XSS attempt"
+    - value: "'; DROP TABLE users;--"
+      description: "SQL injection attempt"
+    - value: "日本語テスト"
+      description: "Unicode characters"
