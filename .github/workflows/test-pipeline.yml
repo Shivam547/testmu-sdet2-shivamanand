@@ -60,7 +60,7 @@ jobs:
 
       - name: Upload Allure Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.test-suite }}
           path: target/allure-results
@@ -68,7 +68,7 @@ jobs:
 
       - name: Upload Allure Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-report-${{ matrix.test-suite }}
           path: target/site/allure-maven-plugin
@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload Test Logs & Screenshots
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-artifacts-${{ matrix.test-suite }}
           path: |
