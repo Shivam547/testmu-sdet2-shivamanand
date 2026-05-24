@@ -12,7 +12,7 @@ on:
       - develop
 
 env:
-  MAVEN_OPTS: -Xmx1024m -XX:MaxPermSize=256m
+  MAVEN_OPTS: -Xmx1024m
 
 jobs:
   test:
@@ -100,6 +100,7 @@ jobs:
             echo "test_passed=true" >> $GITHUB_OUTPUT
           else
             echo "test_passed=false" >> $GITHUB_OUTPUT
+          fi
 
   publish-summary:
     runs-on: ubuntu-latest
