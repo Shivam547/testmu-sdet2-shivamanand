@@ -109,6 +109,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        
       - name: Create Test Summary
         run: |
           echo "## 📊 Test Execution Summary" >> $GITHUB_STEP_SUMMARY
@@ -127,24 +128,7 @@ jobs:
           echo "- 📸 Screenshots (for failed tests)" >> $GITHUB_STEP_SUMMARY
           echo "- 📝 Execution Logs" >> $GITHUB_STEP_SUMMARY
 
-      - name: Generate Email Report
-        if: always()
-        id: email-report
-        run: |
-          chmod +x ./scripts/generate-email-report.sh
-          ./scripts/generate-email-report.sh
-        env:
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          GITHUB_SHA: ${{ github.sha }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_SERVER_URL: ${{ github.server_url }}
-          TEST_RESULTS_PATH: target/surefire-reports
-        continue-on-error: true
-
-      - name: Send Email with Report
+      - name: Send Email with Test Report
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
@@ -152,10 +136,29 @@ jobs:
           server_port: ${{ secrets.EMAIL_PORT }}
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: |
-            🔔 Test Report - Build #${{ github.run_number }} - ${{ github.ref_name }} 
-            (${{ needs.test.result == 'success' && '✅ PASSED' || '❌ FAILED' }})
+          subject: 🔔 Test Report - Build #${{ github.run_number }} - ${{ github.ref_name }} (${{ needs.test.result == 'success' && '✅ PASSED' || '❌ FAILED' }})
           to: ${{ secrets.EMAIL_RECIPIENTS }}
           from: ${{ secrets.EMAIL_FROM }}
-          html_body: file://./email-report.html
+          body: |
+            Test Execution Summary
+            ======================
+            
+            Build Number: ${{ github.run_number }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+            Status: ${{ needs.test.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            
+            View Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            Test Suites Run:
+            - Smoke Tests
+            - Regression Tests
+            
+            Artifacts Available:
+            - Allure Test Reports
+            - Screenshots (for failed tests)
+            - Execution Logs
+            
+            Check the GitHub Actions page for more details.
         continue-on-error: true
