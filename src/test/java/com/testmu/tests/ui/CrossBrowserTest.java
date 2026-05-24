@@ -5,6 +5,7 @@ import com.testmu.pages.SecureAreaPage;
 import com.testmu.tests.BaseTest;
 import io.qameta.allure.*;
 import org.testng.Assert;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 /**
@@ -13,6 +14,10 @@ import org.testng.annotations.Test;
  */
 @Epic("Cross-Browser Testing")
 @Feature("Browser Compatibility")
+@Listeners({
+  io.qameta.allure.testng.AllureTestNg.class,
+  com.testmu.listeners.TestListener.class
+})
 public class CrossBrowserTest extends BaseTest {
     
     // Valid credentials for The Internet Herokuapp

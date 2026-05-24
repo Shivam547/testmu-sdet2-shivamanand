@@ -13,12 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.*;
 
 @Epic("Integration Testing")
 @Feature("Petstore API-UI Integration")
+@Listeners({
+  io.qameta.allure.testng.AllureTestNg.class,
+  com.testmu.listeners.TestListener.class
+})
 public class PetstoreApiUiIntegrationTest extends BaseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(PetstoreApiUiIntegrationTest.class);

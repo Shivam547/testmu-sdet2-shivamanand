@@ -82,6 +82,9 @@ public class TestListener implements ITestListener {
         logger.info("│ ✓ TEST PASSED: {}                                            ", testName);
         logger.info("│ Duration: {} ms                                              ", duration);
         logger.info("└──────────────────────────────────────────────────────────────┘");
+
+        // Capture screenshot on success
+        captureScreenshotOnSuccess(result);
     }
     
     /**
@@ -145,6 +148,27 @@ public class TestListener implements ITestListener {
             if (driver != null) {
                 String testName = result.getMethod().getMethodName();
                 String screenshotPath = ScreenshotUtils.captureScreenshot(driver, testName + "_FAILED");
+                
+                if (screenshotPath != null) {
+                    logger.info("Screenshot captured: {}", screenshotPath);
+                }
+            } else {
+                logger.warn("Cannot capture screenshot - WebDriver is null");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to capture screenshot: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Capture screenshot when test fails
+     */
+    private void captureScreenshotOnSuccess(ITestResult result) {
+        try {
+            WebDriver driver = BrowserFactory.getDriver();
+            if (driver != null) {
+                String testName = result.getMethod().getMethodName();
+                String screenshotPath = ScreenshotUtils.captureScreenshot(driver, testName + "_PASSED");
                 
                 if (screenshotPath != null) {
                     logger.info("Screenshot captured: {}", screenshotPath);

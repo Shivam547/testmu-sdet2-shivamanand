@@ -9,6 +9,7 @@ import io.qameta.allure.*;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -20,6 +21,10 @@ import java.util.Map;
  */
 @Epic("Authentication")
 @Feature("Login")
+@Listeners({
+  io.qameta.allure.testng.AllureTestNg.class,
+  com.testmu.listeners.TestListener.class
+})
 public class LoginTest extends BaseTest {
     
     private LoginPage loginPage;

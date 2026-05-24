@@ -9,6 +9,7 @@ import io.qameta.allure.*;
 import org.openqa.selenium.Cookie;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.util.Set;
@@ -21,6 +22,10 @@ import static com.testmu.config.ConfigReader.getBaseUrl;
  */
 @Epic("Dashboard")
 @Feature("Dashboard Interactions")
+@Listeners({
+  io.qameta.allure.testng.AllureTestNg.class,
+  com.testmu.listeners.TestListener.class
+})
 public class DashboardTest extends BaseTest {
     
     private LoginPage loginPage;

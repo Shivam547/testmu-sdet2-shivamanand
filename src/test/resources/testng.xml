@@ -11,8 +11,10 @@
        verbose="2">
     
     <!-- Global listeners -->
+    <!-- testng.xml listeners order -->
     <listeners>
-        <listener class-name="com.testmu.listeners.TestListener"/>
+    <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    <listener class-name="com.testmu.listeners.TestListener"/>
     </listeners>
     
     <!-- Test parameters - can be overridden at test level -->
