@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test-suite: ['smoke']
+        test-suite: ['smoke', 'regression', 'crossbrowser', 'api']
       fail-fast: false
 
     steps:
