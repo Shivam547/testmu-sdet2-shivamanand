@@ -209,10 +209,22 @@ jobs:
             -Dallure.results.directory=allure-results-consolidated \
             -Dallure.report.path=target/site/allure-maven-plugin
 
+      - name: Prepare Pages Deployment
+        run: |
+          # Create the deployment directory structure
+          mkdir -p pages-deploy
+          
+          # Copy the Allure report to the root of pages-deploy
+          cp -r target/site/allure-maven-plugin/* pages-deploy/ || true
+          
+          # List what we're deploying
+          echo "Files to be deployed to GitHub Pages:"
+          ls -la pages-deploy/
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: target/site/allure-maven-plugin
+          path: pages-deploy
 
       - name: Deploy to GitHub Pages
         id: deployment
