@@ -114,7 +114,7 @@ jobs:
       - name: Consolidate Allure Results
         run: |
           mkdir -p allure-results-consolidated
-          for suite in crossbrowser api; do
+          for suite in smoke regression crossbrowser api; do
             if [ -d "artifacts/allure-results-$suite" ]; then
               cp -r artifacts/allure-results-$suite/. allure-results-consolidated/ || true
             fi
