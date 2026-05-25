@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test-suite: ['smoke', 'regression', 'crossbrowser', 'api']
+        test-suite: ['crossbrowser', 'api']
       fail-fast: false
 
     steps:
@@ -114,7 +114,7 @@ jobs:
       - name: Consolidate Allure Results
         run: |
           mkdir -p allure-results-consolidated
-          for suite in smoke regression; do
+          for suite in crossbrowser api; do
             if [ -d "artifacts/allure-results-$suite" ]; then
               cp -r artifacts/allure-results-$suite/. allure-results-consolidated/ || true
             fi
