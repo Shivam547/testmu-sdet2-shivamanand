@@ -1,6 +1,7 @@
 # TestMu SDET-2 Test Automation Framework
 
 > A unified, scalable test automation framework for UI, API, and Integration testing built with Selenium WebDriver and Java.
+> Live Hosted Site - https://shivam547.github.io/testmu-sdet2-shivamanand/
 
 ---
 
@@ -250,6 +251,11 @@ mvn allure:report
 - **Categories** - Failure categorization
 
 ---
+
+### Sample Output
+
+<img width="2936" height="1602" alt="image" src="https://github.com/user-attachments/assets/e4292130-a142-4e28-8296-d7ee3764a843" />
+
 
 ## ⚙️ Configuration
 
