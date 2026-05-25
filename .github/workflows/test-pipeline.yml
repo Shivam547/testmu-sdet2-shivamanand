@@ -15,7 +15,7 @@ env:
   MAVEN_OPTS: -Xmx1024m
 
 permissions:
-  contents: read
+  contents: write        # ← changed from read (needed to push gh-pages history)
   pages: write
   id-token: write
 
@@ -58,25 +58,12 @@ jobs:
             -DfailIfNoTests=false
         continue-on-error: true
 
-      - name: Generate Allure Report
-        if: always()
-        run: mvn allure:report -q
-        continue-on-error: true
-
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.test-suite }}
           path: target/allure-results
-          retention-days: 30
-
-      - name: Upload Allure Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report-${{ matrix.test-suite }}
-          path: target/site/allure-maven-plugin
           retention-days: 30
 
       - name: Upload Test Logs & Screenshots
@@ -107,31 +94,90 @@ jobs:
             echo "test_passed=false" >> $GITHUB_OUTPUT
           fi
 
-  publish-summary:
+  deploy-allure-report:
     runs-on: ubuntu-latest
     needs: test
+    if: always()
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download All Allure Results
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Consolidate Allure Results
+        run: |
+          mkdir -p allure-results-consolidated
+          for suite in smoke regression; do
+            if [ -d "artifacts/allure-results-$suite" ]; then
+              cp -r artifacts/allure-results-$suite/. allure-results-consolidated/ || true
+            fi
+          done
+          echo "Consolidated results:"
+          ls -la allure-results-consolidated/
+
+      # ✅ FIX 1: Use allure CLI directly — avoids Maven report path confusion
+      - name: Install Allure CLI
+        run: |
+          curl -o allure-2.27.0.tgz -L \
+            https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+          tar -zxvf allure-2.27.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
+
+      # ✅ FIX 2: Fetch existing history from gh-pages so trend graphs work
+      - name: Get Allure History
+        continue-on-error: true
+        run: |
+          git fetch origin gh-pages || true
+          mkdir -p allure-results-consolidated/history
+          git show origin/gh-pages:history 2>/dev/null | \
+            tar x -C allure-results-consolidated/history || true
+
+      # ✅ FIX 3: Generate report into a clean folder — index.html will be at root
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results-consolidated \
+            --clean \
+            -o allure-report
+          echo "--- Verifying index.html exists ---"
+          ls -la allure-report/
+          test -f allure-report/index.html && echo "✅ index.html found" || echo "❌ index.html MISSING"
+
+      # ✅ FIX 4: Upload exactly the folder containing index.html
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report    # ← this folder has index.html at its root
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  publish-summary:
+    runs-on: ubuntu-latest
+    needs: [test, deploy-allure-report]
     if: always()
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        
+
       - name: Create Test Summary
         run: |
           echo "## 📊 Test Execution Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Build:** [${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test Suites Run" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Smoke Tests" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Regression Tests" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Artifacts Available" >> $GITHUB_STEP_SUMMARY
-          echo "- 📋 Allure Test Reports" >> $GITHUB_STEP_SUMMARY
-          echo "- 📸 Screenshots (for failed tests)" >> $GITHUB_STEP_SUMMARY
-          echo "- 📝 Execution Logs" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Allure Report" >> $GITHUB_STEP_SUMMARY
+          echo "https://shivam547.github.io/testmu-sdet2-shivamanand/" >> $GITHUB_STEP_SUMMARY
 
       - name: Send Email with Test Report
         if: always()
@@ -147,85 +193,15 @@ jobs:
           body: |
             Test Execution Summary
             ======================
-            
-            Build Number: ${{ github.run_number }}
-            Branch: ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
-            Author: ${{ github.actor }}
-            Status: ${{ needs.test.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
-            
-            View Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
-            Test Suites Run:
-            - Smoke Tests
-            - Regression Tests
-            
-            Artifacts Available:
-            - Allure Test Reports
-            - Screenshots (for failed tests)
-            - Execution Logs
-            
-            Check the GitHub Actions page for more details.
+            Build:   #${{ github.run_number }}
+            Branch:  ${{ github.ref_name }}
+            Commit:  ${{ github.sha }}
+            Author:  ${{ github.actor }}
+            Status:  ${{ needs.test.result == 'success' && '✅ PASSED' || '❌ FAILED' }}
+
+            Allure Report:
+            https://shivam547.github.io/testmu-sdet2-shivamanand/
+
+            Actions Run:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         continue-on-error: true
-
-  deploy-allure-report:
-    runs-on: ubuntu-latest
-    needs: test
-    if: always()
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Download All Test Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Consolidate Allure Results
-        run: |
-          mkdir -p allure-results-consolidated
-          
-          # Copy results from all test suites
-          for suite in smoke regression; do
-            if [ -d "artifacts/allure-results-$suite" ]; then
-              cp -r artifacts/allure-results-$suite/* allure-results-consolidated/ || true
-            fi
-          done
-          
-          echo "Consolidated allure results:"
-          ls -la allure-results-consolidated/ || echo "No results found"
-
-      - name: Generate Consolidated Allure Report
-        continue-on-error: true
-        run: |
-          mvn allure:report \
-            -Dallure.results.directory=allure-results-consolidated \
-            -Dallure.report.path=target/site/allure-maven-plugin
-
-      - name: Prepare Pages Deployment
-        run: |
-          # Create the deployment directory structure
-          mkdir -p pages-deploy
-          
-          # Copy the Allure report to the root of pages-deploy
-          cp -r target/site/allure-maven-plugin/* pages-deploy/ || true
-          
-          # List what we're deploying
-          echo "Files to be deployed to GitHub Pages:"
-          ls -la pages-deploy/
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: pages-deploy
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
